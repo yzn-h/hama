@@ -6,6 +6,7 @@
   import SchemaForm from "$lib/utils/schema-form.svelte";
   import * as v from "valibot";
   import * as Card from "$lib/components/ui/card/index.js";
+  import { scale } from "svelte/transition";
 
   import GripVertical from "@lucide/svelte/icons/grip-vertical";
   import PenIcon from "@lucide/svelte/icons/pen";
@@ -140,7 +141,7 @@
 >
   <RadioGroup.Root
     bind:value={currentMode}
-    class="grid gap-3 md:grid-cols-2 max-w-lg w-full place-self-center p-4"
+    class="grid gap-3 grid-cols-2 max-w-lg w-full place-self-center p-4"
   >
     {#each [{ id: "preview", label: "Preview Mode" }, { id: "edit", label: "Edit Mode" }] as mode (mode.id)}
       <Label
@@ -232,6 +233,7 @@
       {#each blocks as block (block.id)}
         <div
           animate:flip={{ duration: flipDurationMs }}
+          in:scale={{ duration: 150 }}
           class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200 relative"
           data-drag-disabled="true"
         >
