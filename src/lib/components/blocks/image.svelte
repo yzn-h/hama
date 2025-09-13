@@ -1,12 +1,12 @@
 <script module lang="ts">
-  import { z } from "zod";
+  import * as v from "valibot";
 
-  export const imageSchema = z.object({
-    src: z.string().url().default("https://placehold.co/600x400"),
-    alt: z.string().default("Image"),
+  export const imageSchema = v.object({
+    src: v.optional(v.pipe(v.string(), v.url()), "https://placehold.co/600x400"),
+    alt: v.optional(v.string(), "Image"),
   });
 
-  export type imageProps = z.infer<typeof imageSchema>;
+  export type imageProps = v.InferOutput<typeof imageSchema>;
   export const image = imageSnippet;
 </script>
 

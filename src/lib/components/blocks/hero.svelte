@@ -1,11 +1,11 @@
 <script module lang="ts">
-  import { z } from "zod";
+  import * as v from "valibot";
 
-  export const heroSchema = z.object({
-    title: z.string().default("Hello"),
+  export const heroSchema = v.object({
+    title: v.optional(v.string(), "Hello"),
   });
 
-  export type heroProps = z.infer<typeof heroSchema>;
+  export type heroProps = v.InferOutput<typeof heroSchema>;
   export const hero = heroSnippet;
 </script>
 

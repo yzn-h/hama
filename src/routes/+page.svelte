@@ -4,8 +4,8 @@
   import { Label } from "@/components/ui/label";
   import * as Collapsible from "$lib/components/ui/collapsible/index.js";
   import SchemaForm from "$lib/utils/schema-form.svelte";
+  import * as v from "valibot";
 
-  import type { Snippet } from "svelte";
   import GripVertical from "@lucide/svelte/icons/grip-vertical";
   import PenIcon from "@lucide/svelte/icons/pen-tool";
 
@@ -30,7 +30,7 @@
   ]);
 
   function addBlock(block: keyof typeof snippets) {
-    const defaultProps = schemas[block].parse({});
+    const defaultProps = v.parse(schemas[block], {});
     blocks.push({
       id: crypto.randomUUID(),
       type: block,
@@ -100,7 +100,10 @@
             </div>
 
             <Collapsible.Content class="space-y-2 w-full mt-4">
-              <SchemaForm schema={schemas[block.type]} bind:values={block.props} />
+              <SchemaForm
+                schema={schemas[block.type]}
+                bind:values={block.props}
+              />
             </Collapsible.Content>
           </Collapsible.Root>
         </div>

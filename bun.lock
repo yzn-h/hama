@@ -5,6 +5,7 @@
       "name": "hama",
       "dependencies": {
         "@dnd-kit-svelte/svelte": "^0.1.3",
+        "valibot": "^1.1.0",
         "zod": "^4.1.8",
       },
       "devDependencies": {

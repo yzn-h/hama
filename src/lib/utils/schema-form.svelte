@@ -1,147 +1,199 @@
 <script lang="ts">
-  import { z } from "zod";
+  import * as v from "valibot";
   import type {
-    ZodSchema,
-    ZodTypeAny,
-    ZodType,
-    ZodObject,
-    ZodNullable,
-    ZodOptional,
-    ZodArray,
-  } from "zod";
+    BaseSchema,
+    ObjectSchema,
+    ArraySchema,
+    PicklistSchema,
+    OptionalSchema,
+    NullableSchema
+  } from "valibot";
 
   interface Props {
-    schema: ZodSchema;
+    schema: BaseSchema<unknown, unknown, any>;
     values: Record<string, any>;
   }
 
   let { schema, values = $bindable() }: Props = $props();
 
-  function getInputType(fieldSchema: any): string {
-    if (fieldSchema instanceof z.ZodString) {
-      const checks = fieldSchema._def.checks || [];
-
-      for (const check of checks) {
-        if (check.kind === "email") return "email";
-        if (check.kind === "url") return "url";
-      }
-
+  function getInputType(fieldSchema: BaseSchema<unknown, unknown, any>): string {
+    // Check schema type using Valibot's type property
+    if (!fieldSchema || typeof fieldSchema !== 'object' || !fieldSchema.type) {
       return "text";
     }
-
-    if (fieldSchema instanceof z.ZodNumber) {
+    const schemaType = fieldSchema.type;
+    
+    if (schemaType === "string") {
+      // For now, return text - email/url detection would require examining the pipe
+      return "text";
+    }
+    
+    if (schemaType === "number") {
       return "number";
     }
-
-    if (fieldSchema instanceof z.ZodBoolean) {
+    
+    if (schemaType === "boolean") {
       return "checkbox";
     }
-
-    if (fieldSchema instanceof z.ZodEnum) {
+    
+    if (schemaType === "picklist") {
       return "select";
     }
-
+    
     return "text";
   }
 
-  function getOptions(fieldSchema: any): string[] | null {
-    if (fieldSchema instanceof z.ZodEnum) {
-      return fieldSchema._def.values;
+  function getOptions(fieldSchema: BaseSchema<unknown, unknown, any>): string[] | null {
+    if (!fieldSchema || typeof fieldSchema !== 'object' || !fieldSchema.type) {
+      return null;
+    }
+    if (fieldSchema.type === "picklist") {
+      const picklistSchema = fieldSchema as PicklistSchema<any, any>;
+      if (picklistSchema.options) {
+        return picklistSchema.options as string[];
+      }
     }
     return null;
   }
 
-  function getDefaultValue(fieldSchema: any): any {
-    if (fieldSchema._def.defaultValue) {
-      return fieldSchema._def.defaultValue();
+  function getDefaultValue(fieldSchema: BaseSchema<unknown, unknown, any>): any {
+    if (!fieldSchema || typeof fieldSchema !== 'object' || !fieldSchema.type) {
+      return "";
     }
+    
+    // Valibot doesn't expose default values the same way
+    // Try to parse undefined to see if there's a default
+    try {
+      const result = v.safeParse(fieldSchema, undefined);
+      if (result.success) {
+        return result.output;
+      }
+    } catch {}
+    
+    // Return appropriate default based on type
+    const schemaType = fieldSchema.type;
+    if (schemaType === "string") return "";
+    if (schemaType === "number") return 0;
+    if (schemaType === "boolean") return false;
     return "";
   }
 
-  // get zod object keys recursively
-  const zodKeys = <T extends z.ZodTypeAny>(schema: T): string[] => {
-    // make sure schema is not null or undefined
-    if (schema === null || schema === undefined) return [];
+  // get valibot object keys recursively
+  const valibotKeys = (schema: BaseSchema<unknown, unknown, any>): string[] => {
+    // make sure schema is not null or undefined and has a type property
+    if (!schema || typeof schema !== 'object' || !schema.type) return [];
+    
     // check if schema is nullable or optional
-    if (schema instanceof z.ZodNullable || schema instanceof z.ZodOptional)
-      return zodKeys(schema.unwrap());
+    if (schema.type === "nullable") {
+      const nullableSchema = schema as NullableSchema<any, any>;
+      if (nullableSchema.wrapped) {
+        return valibotKeys(nullableSchema.wrapped);
+      }
+    }
+    if (schema.type === "optional") {
+      const optionalSchema = schema as OptionalSchema<any, any>;
+      if (optionalSchema.wrapped) {
+        return valibotKeys(optionalSchema.wrapped);
+      }
+    }
+    
     // check if schema is an array
-    if (schema instanceof z.ZodArray) return zodKeys(schema.element);
+    if (schema.type === "array") {
+      const arraySchema = schema as ArraySchema<any, any>;
+      if (arraySchema.item) {
+        return valibotKeys(arraySchema.item);
+      }
+    }
+    
     // check if schema is an object
-    if (schema instanceof z.ZodObject) {
-      // get key/value pairs from schema
-      const entries = Object.entries(schema.shape);
+    if (schema.type === "object") {
+      const objectSchema = schema as ObjectSchema<any, any>;
+      if (!objectSchema.entries) {
+        return [];
+      }
+      const entries = Object.entries(objectSchema.entries);
       // loop through key/value pairs
       return entries.flatMap(([key, value]) => {
         // get nested keys
-        const nested =
-          value instanceof z.ZodType
-            ? zodKeys(value).map((subKey) => `${key}.${subKey}`)
-            : [];
-        // return nested keys
-        return nested.length ? nested : key;
+        try {
+          const nested = valibotKeys(value as BaseSchema<unknown, unknown, any>)
+            .map((subKey) => `${key}.${subKey}`);
+          return nested.length ? nested : [key];
+        } catch {
+          return [key];
+        }
       });
     }
+    
     // return empty array
     return [];
   };
 
-  const getSchemaField = (schema: any, fieldName: string) => {
-    if (schema instanceof z.ZodObject) {
-      return schema.shape[fieldName];
+  const getSchemaField = (schema: BaseSchema<unknown, unknown, any>, fieldName: string): BaseSchema<unknown, unknown, any> | null => {
+    if (!schema || typeof schema !== 'object' || !schema.type) {
+      return null;
+    }
+    if (schema.type === "object") {
+      const objectSchema = schema as ObjectSchema<any, any>;
+      if (!objectSchema.entries) {
+        return null;
+      }
+      return (objectSchema.entries[fieldName] as BaseSchema<unknown, unknown, any>) || null;
     }
     return null;
   };
 
-  const fieldNames = zodKeys(schema);
-  const fields = fieldNames.map((fieldName) => [
-    fieldName,
-    getSchemaField(schema, fieldName),
-  ]);
+  const fieldNames = valibotKeys(schema);
+  const fields = fieldNames.map((fieldName) => ({
+    name: fieldName,
+    schema: getSchemaField(schema, fieldName),
+  }));
 
   // Initialize values with defaults if not provided
-  for (const [fieldName, fieldSchema] of fields) {
-    if (fieldSchema && values[fieldName] === undefined) {
-      values[fieldName] = getDefaultValue(fieldSchema);
+  for (const field of fields) {
+    if (field.schema && values[field.name] === undefined) {
+      values[field.name] = getDefaultValue(field.schema);
     }
   }
 </script>
 
 <div class="space-y-4">
-  {#each fields as [fieldName, fieldSchema]}
-    {@const inputType = getInputType(fieldSchema)}
-    {@const options = getOptions(fieldSchema)}
+  {#each fields as field}
+    {#if field.schema}
+      {@const inputType = getInputType(field.schema)}
+      {@const options = getOptions(field.schema)}
 
-    <div class="space-y-2">
-      <label for={fieldName} class="text-sm font-medium capitalize">
-        {fieldName.replace(/([A-Z])/g, " $1").toLowerCase()}
-      </label>
+      <div class="space-y-2">
+        <label for={field.name} class="text-sm font-medium capitalize">
+          {field.name.replace(/([A-Z])/g, " $1").toLowerCase()}
+        </label>
 
-      {#if inputType === "select" && options}
-        <select
-          id={fieldName}
-          bind:value={values[fieldName]}
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          {#each options as option}
-            <option value={option}>{option}</option>
-          {/each}
-        </select>
-      {:else if inputType === "checkbox"}
-        <input
-          id={fieldName}
-          type="checkbox"
-          bind:checked={values[fieldName]}
-          class="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
-        />
-      {:else}
-        <input
-          id={fieldName}
-          type={inputType}
-          bind:value={values[fieldName]}
-          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      {/if}
-    </div>
+        {#if inputType === "select" && options}
+          <select
+            id={field.name}
+            bind:value={values[field.name]}
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {#each options as option}
+              <option value={option}>{option}</option>
+            {/each}
+          </select>
+        {:else if inputType === "checkbox"}
+          <input
+            id={field.name}
+            type="checkbox"
+            bind:checked={values[field.name]}
+            class="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+          />
+        {:else}
+          <input
+            id={field.name}
+            type={inputType}
+            bind:value={values[field.name]}
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        {/if}
+      </div>
+    {/if}
   {/each}
 </div>

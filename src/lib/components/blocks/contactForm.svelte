@@ -1,11 +1,11 @@
 <script module lang="ts">
-  import { z } from "zod";
+  import * as v from "valibot";
 
-  export const contactFormSchema = z.object({
-    email: z.string().email().default("company@example.com"),
+  export const contactFormSchema = v.object({
+    email: v.optional(v.pipe(v.string(), v.email()), "company@example.com"),
   });
 
-  export type contactFormProps = z.infer<typeof contactFormSchema>;
+  export type contactFormProps = v.InferOutput<typeof contactFormSchema>;
   export const contactForm = contactFormSnippet;
 </script>
 
