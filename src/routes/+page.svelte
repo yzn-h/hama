@@ -158,18 +158,18 @@
     {/each}
   </RadioGroup.Root>
   {#if currentMode === "edit"}
-    <div class="flex flex-col gap-6 p-4">
+    <div class="flex flex-col gap-6">
       <div class="space-y-4">
         <h3 class="text-lg font-semibold text-center text-gray-800">
           Add Content Blocks
         </h3>
         <div
-          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 max-w-4xl mx-auto lg:bg-amber-200"
+          class="flex gap-3 overflow-x-scroll w-full lg:w-full lg:grid lg:grid-cols-5 lg:overflow-x-visible max-w-4xl mx-auto p-2"
         >
           {#each [{ type: "hero", icon: StarIcon, label: "Hero", description: "Main banner section" }, { type: "image", icon: ImageIcon, label: "Image", description: "Visual content" }, { type: "paragraph", icon: FileTextIcon, label: "Text", description: "Rich text content" }, { type: "contactForm", icon: MailIcon, label: "Form", description: "Contact form" }, { type: "footer", icon: PannelBottomIcon, label: "Footer", description: "Page footer" }] as blockType}
             <button
               onclick={() => addBlock(blockType.type as keyof typeof snippets)}
-              class="group relative flex flex-col items-center justify-center p-4 rounded-lg border-2 border-gray-200 bg-white hover:border-blue-300 hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+              class="group relative flex min-w-auto md:min-w-[170px] flex-col items-center justify-center p-4 rounded-lg border-2 border-gray-200 bg-white hover:border-blue-300 hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 flex-shrink-0"
             >
               <div
                 class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 group-hover:bg-blue-50 transition-colors mb-2"
