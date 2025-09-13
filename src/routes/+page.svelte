@@ -8,10 +8,10 @@
   import * as Card from "$lib/components/ui/card/index.js";
 
   import GripVertical from "@lucide/svelte/icons/grip-vertical";
-  import PenIcon from "@lucide/svelte/icons/pen-tool";
-  import Download from "@lucide/svelte/icons/download";
+  import PenIcon from "@lucide/svelte/icons/pen";
+  import Save from "@lucide/svelte/icons/save";
   import Upload from "@lucide/svelte/icons/upload";
-  import X from "@lucide/svelte/icons/x";
+  import Trash from "@lucide/svelte/icons/trash-2";
   import {
     dndzone,
     dragHandle,
@@ -125,7 +125,7 @@
   }
 
   function deleteBlock(id: string) {
-    blocks = blocks.filter(block => block.id !== id);
+    blocks = blocks.filter((block) => block.id !== id);
   }
 </script>
 
@@ -182,8 +182,8 @@
           size="sm"
           class="flex items-center gap-2"
         >
-          <Download class="h-4 w-4" />
-          Export
+          <Save class="h-4 w-4" />
+          Save
         </Button>
         <Button
           onclick={importFromFile}
@@ -214,10 +214,10 @@
         >
           <button
             onclick={() => deleteBlock(block.id)}
-            class="absolute -top-1 -right-1 w-4 h-4 bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-gray-800 rounded-full flex items-center justify-center shadow-sm transition-colors z-10"
+            class="absolute -top-2 -right-2 size-5 bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-gray-800 rounded-full flex items-center justify-center shadow-sm transition-colors z-10"
             title="Delete block"
           >
-            <X class="h-2 w-2" />
+            <Trash class="size-3" />
           </button>
           <Collapsible.Root class=" flex w-full flex-col h-full items-center">
             <div class="flex w-full h-full items-center">
