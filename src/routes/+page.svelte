@@ -5,6 +5,7 @@
   import * as Collapsible from "$lib/components/ui/collapsible/index.js";
   import SchemaForm from "$lib/utils/schema-form.svelte";
   import * as v from "valibot";
+  import * as Card from "$lib/components/ui/card/index.js";
 
   import GripVertical from "@lucide/svelte/icons/grip-vertical";
   import PenIcon from "@lucide/svelte/icons/pen-tool";
@@ -58,22 +59,46 @@
   }
 </script>
 
-<div class="h-[100svh] overflow-hidden flex flex-col w-full">
+<div
+  class="h-[100svh] fixed max-h-[100svh] overflow-hidden flex flex-col w-full p-1"
+>
+  <RadioGroup.Root
+    bind:value={currentMode}
+    class="grid gap-3 md:grid-cols-2 max-w-lg w-full place-self-center p-4"
+  >
+    {#each [{ id: "preview", label: "Preview Mode" }, { id: "edit", label: "Edit Mode" }] as mode (mode.id)}
+      <Label
+        class="has-[[data-state=checked]]:border-ring has-[[data-state=checked]]:bg-input/20 flex items-start gap-3 rounded-lg border p-3"
+      >
+        <RadioGroup.Item
+          value={mode.id}
+          id={mode.id}
+          class="data-[state=checked]:border-primary"
+        />
+        <div class="grid gap-1 font-normal">
+          <div class="font-medium">{mode.label}</div>
+        </div>
+      </Label>
+    {/each}
+  </RadioGroup.Root>
   {#if currentMode === "edit"}
-    <div></div>
-    <button onclick={() => addBlock("image")}>add image</button>
-    <button onclick={() => addBlock("contactForm")}>add form</button>
-    <button onclick={() => addBlock("footer")}>add footer</button>
-    <button onclick={() => addBlock("paragraph")}>add text</button>
-    <button onclick={() => addBlock("hero")}>add hero</button>
-    <button onclick={() => addBlock("paragraph")}>add paragraph</button>
+    <div>
+      <button onclick={() => addBlock("image")}>add image</button>
+      <button onclick={() => addBlock("contactForm")}>add form</button>
+      <button onclick={() => addBlock("footer")}>add footer</button>
+      <button onclick={() => addBlock("paragraph")}>add text</button>
+      <button onclick={() => addBlock("hero")}>add hero</button>
+      <button onclick={() => addBlock("paragraph")}>add paragraph</button>
 
-    <button onclick={() => serializeBlocks()}>test serialize</button>
-    <button onclick={() => deserializeBlocks(serializeBlocks())}
-      >test deserialize</button
+      <button onclick={() => serializeBlocks()}>test serialize</button>
+      <button onclick={() => deserializeBlocks(serializeBlocks())}
+        >test deserialize</button
+      >
+    </div>
+
+    <div
+      class="overflow-y-auto flex flex-col my-5 p-2 gap-3 grow w-full max-w-2xl place-self-center"
     >
-
-    <div class="overflow-y-scroll flex-1 flex flex-col gap-3 grow">
       {#each blocks as block}
         <div
           class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200"
@@ -100,7 +125,7 @@
               </Collapsible.Trigger>
             </div>
 
-            <Collapsible.Content class="space-y-2 w-full mt-4">
+            <Collapsible.Content class="space-y-2 w-full mt-4 overflow-visible">
               <SchemaForm
                 schema={schemas[block.type]}
                 bind:values={block.props}
@@ -111,31 +136,19 @@
       {/each}
     </div>
   {:else}
-    <div class="overflow-y-scroll flex-1 flex flex-col grow">
-      {#each blocks as block}
-        {@render block.block(block.props)}
-      {/each}
-    </div>
+    <Card.Root
+      class="overflow-y-auto flex flex-col grow my-5 p-2 place-self-center w-full max-w-2xl"
+    >
+      <!-- <Card.Root class="w-full "> -->
+      <Card.Content>
+        {#each blocks as block}
+          {@render block.block(block.props)}
+        {/each}
+      </Card.Content>
+    </Card.Root>
+    <!-- </div> -->
   {/if}
-  <RadioGroup.Root
-    bind:value={currentMode}
-    class="grid gap-3 md:grid-cols-2  w-full"
-  >
-    {#each [{ id: "preview", label: "Preview Mode" }, { id: "edit", label: "Edit Mode" }] as mode (mode.id)}
-      <Label
-        class="has-[[data-state=checked]]:border-ring has-[[data-state=checked]]:bg-input/20 flex items-start gap-3 rounded-lg border p-3"
-      >
-        <RadioGroup.Item
-          value={mode.id}
-          id={mode.id}
-          class="data-[state=checked]:border-primary"
-        />
-        <div class="grid gap-1 font-normal">
-          <div class="font-medium">{mode.label}</div>
-        </div>
-      </Label>
-    {/each}
-  </RadioGroup.Root>
+
   <!-- <Preview> -->
 </div>
 
