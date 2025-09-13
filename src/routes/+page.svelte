@@ -12,6 +12,12 @@
   import Save from "@lucide/svelte/icons/save";
   import Upload from "@lucide/svelte/icons/upload";
   import Trash from "@lucide/svelte/icons/trash-2";
+  import ImageIcon from "@lucide/svelte/icons/image";
+  import FileTextIcon from "@lucide/svelte/icons/file-text";
+  import MailIcon from "@lucide/svelte/icons/mail";
+  import PannelBottomIcon from "@lucide/svelte/icons/panel-bottom";
+  import StarIcon from "@lucide/svelte/icons/star";
+  import Plus from "@lucide/svelte/icons/plus";
   import {
     dndzone,
     dragHandle,
@@ -152,27 +158,44 @@
     {/each}
   </RadioGroup.Root>
   {#if currentMode === "edit"}
-    <div class="flex flex-col gap-4 p-4">
-      <div class="flex flex-wrap gap-2">
-        <Button onclick={() => addBlock("image")} variant="outline" size="sm"
-          >add image</Button
+    <div class="flex flex-col gap-6 p-4">
+      <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-center text-gray-800">
+          Add Content Blocks
+        </h3>
+        <div
+          class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 max-w-4xl mx-auto lg:bg-amber-200"
         >
-        <Button
-          onclick={() => addBlock("contactForm")}
-          variant="outline"
-          size="sm">add form</Button
-        >
-        <Button onclick={() => addBlock("footer")} variant="outline" size="sm"
-          >add footer</Button
-        >
-        <Button
-          onclick={() => addBlock("paragraph")}
-          variant="outline"
-          size="sm">add text</Button
-        >
-        <Button onclick={() => addBlock("hero")} variant="outline" size="sm"
-          >add hero</Button
-        >
+          {#each [{ type: "hero", icon: StarIcon, label: "Hero", description: "Main banner section" }, { type: "image", icon: ImageIcon, label: "Image", description: "Visual content" }, { type: "paragraph", icon: FileTextIcon, label: "Text", description: "Rich text content" }, { type: "contactForm", icon: MailIcon, label: "Form", description: "Contact form" }, { type: "footer", icon: PannelBottomIcon, label: "Footer", description: "Page footer" }] as blockType}
+            <button
+              onclick={() => addBlock(blockType.type as keyof typeof snippets)}
+              class="group relative flex flex-col items-center justify-center p-4 rounded-lg border-2 border-gray-200 bg-white hover:border-blue-300 hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95"
+            >
+              <div
+                class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 group-hover:bg-blue-50 transition-colors mb-2"
+              >
+                <blockType.icon
+                  class="h-6 w-6 text-gray-600 group-hover:text-blue-600"
+                />
+              </div>
+              <div class="text-center">
+                <div class="font-medium text-gray-900 mb-1">
+                  {blockType.label}
+                </div>
+                <div class="text-xs text-gray-500 leading-tight">
+                  {blockType.description}
+                </div>
+              </div>
+              <div
+                class="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <Plus
+                  class="h-4 w-4 text-blue-600 bg-white rounded-full border border-blue-200"
+                />
+              </div>
+            </button>
+          {/each}
+        </div>
       </div>
 
       <div class="flex gap-2 justify-center">
