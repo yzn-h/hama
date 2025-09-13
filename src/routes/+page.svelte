@@ -11,9 +11,18 @@
   import PenIcon from "@lucide/svelte/icons/pen-tool";
   import Download from "@lucide/svelte/icons/download";
   import Upload from "@lucide/svelte/icons/upload";
+  import {
+    dndzone,
+    dragHandle,
+    dragHandleZone,
+    TRIGGERS,
+  } from "svelte-dnd-action";
 
   import { buttonVariants } from "@/components/ui/button";
   import { Button } from "@/components/ui/button";
+  import { flip } from "svelte/animate";
+
+  let flipDurationMs = 100;
 
   let currentMode: "edit" | "preview" = $state("edit");
   $inspect(currentMode);
@@ -26,7 +35,7 @@
 
   let blocks: block[] = $state([
     {
-      id: crypto.randomUUID(),
+      id: "demo1",
       type: "hero",
       block: snippets.hero,
       props: { title: "Hello" },
@@ -35,8 +44,11 @@
 
   function addBlock(block: keyof typeof snippets) {
     const defaultProps = v.parse(schemas[block], {});
+    const id = crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString();
     blocks.push({
-      id: crypto.randomUUID(),
+      id: id,
       type: block,
       block: snippets[block],
       props: defaultProps,
@@ -105,6 +117,10 @@
     };
 
     input.click();
+  }
+
+  function handleSort(e: CustomEvent) {
+    blocks = e.detail.items;
   }
 </script>
 
@@ -178,15 +194,25 @@
 
     <div
       class="overflow-y-auto flex flex-col my-5 p-2 gap-3 grow w-full max-w-2xl place-self-center"
+      use:dragHandleZone={{
+        items: blocks,
+        flipDurationMs,
+      }}
+      onconsider={handleSort}
+      onfinalize={handleSort}
     >
-      {#each blocks as block}
+      {#each blocks as block (block.id)}
         <div
+          animate:flip={{ duration: flipDurationMs }}
           class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200"
+          data-drag-disabled="true"
         >
           <Collapsible.Root class=" flex w-full flex-col h-full items-center">
             <div class="flex w-full h-full items-center">
               <div
-                class="cursor-move text-gray-400 hover:text-gray-600 flex-shrink-0"
+                use:dragHandle
+                class="drag-handle cursor-move text-gray-400 hover:text-gray-600 flex-shrink-0"
+                data-drag-disabled="false"
               >
                 <GripVertical class="h-5 w-5" />
               </div>
