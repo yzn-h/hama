@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { snippets } from "$lib";
+  import { snippets, schemas } from "$lib";
   import * as RadioGroup from "@/components/ui/radio-group/index.js";
   import { Label } from "@/components/ui/label";
   import * as Collapsible from "$lib/components/ui/collapsible/index.js";
+  import SchemaForm from "$lib/utils/schema-form.svelte";
 
   import type { Snippet } from "svelte";
   import GripVertical from "@lucide/svelte/icons/grip-vertical";
@@ -29,11 +30,12 @@
   ]);
 
   function addBlock(block: keyof typeof snippets) {
+    const defaultProps = schemas[block].parse({});
     blocks.push({
       id: crypto.randomUUID(),
       type: block,
       block: snippets[block],
-      props: {},
+      props: defaultProps,
     });
   }
 
@@ -97,8 +99,8 @@
               </Collapsible.Trigger>
             </div>
 
-            <Collapsible.Content class="space-y-2">
-              {#each block.props as prop, i}{/each}
+            <Collapsible.Content class="space-y-2 w-full mt-4">
+              <SchemaForm schema={schemas[block.type]} bind:values={block.props} />
             </Collapsible.Content>
           </Collapsible.Root>
         </div>

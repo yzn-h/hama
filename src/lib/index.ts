@@ -1,9 +1,15 @@
 // place files you want to import through the `$lib` alias in this folder.
-import { hero } from "@/components/blocks/hero.svelte";
-import { image } from "./components/blocks/image.svelte";
-import { contactForm } from "./components/blocks/contactForm.svelte";
-import { footer } from "./components/blocks/footer.svelte";
-import { paragraph } from "./components/blocks/paragraph.svelte";
+import { hero, heroSchema } from "@/components/blocks/hero.svelte";
+import { image, imageSchema } from "./components/blocks/image.svelte";
+import {
+  contactForm,
+  contactFormSchema,
+} from "./components/blocks/contactForm.svelte";
+import { footer, footerSchema } from "./components/blocks/footer.svelte";
+import {
+  paragraph,
+  paragraphSchema,
+} from "./components/blocks/paragraph.svelte";
 
 export const snippets = {
   hero,
@@ -13,4 +19,10 @@ export const snippets = {
   paragraph,
 };
 
-export type 
+export const schemas = {
+  hero: heroSchema,
+  image: imageSchema,
+  contactForm: contactFormSchema,
+  footer: footerSchema,
+  paragraph: paragraphSchema,
+};

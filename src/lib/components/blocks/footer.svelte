@@ -1,16 +1,16 @@
 <script module lang="ts">
-  export const footer = footerSnippet;
+  import { z } from "zod";
 
-  export const footerProps = {
-    email: "you@example.com",
-    name: "Your Name",
-  } as {
-    email?: string;
-    name?: string;
-  };
+  export const footerSchema = z.object({
+    email: z.string().email().default("you@example.com"),
+    name: z.string().default("Your Name"),
+  });
+
+  export type footerProps = z.infer<typeof footerSchema>;
+  export const footer = footerSnippet;
 </script>
 
-{#snippet footerSnippet({ email, name }: typeof footerProps)}
+{#snippet footerSnippet({ email, name }: footerProps)}
   <footer class="">
     {email} |
     {name}

@@ -1,14 +1,15 @@
 <script module lang="ts">
-  export const contactForm = contactFormSnippet;
+  import { z } from "zod";
 
-  export const contactFormProps = {
-    email: "company@example.com",
-  } as {
-    email?: string;
-  };
+  export const contactFormSchema = z.object({
+    email: z.string().email().default("company@example.com"),
+  });
+
+  export type contactFormProps = z.infer<typeof contactFormSchema>;
+  export const contactForm = contactFormSnippet;
 </script>
 
-{#snippet contactFormSnippet({ email }: typeof contactFormProps)}
+{#snippet contactFormSnippet({ email }: contactFormProps)}
   <form class="">
     <label for="email"
       >Email

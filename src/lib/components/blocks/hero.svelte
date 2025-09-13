@@ -1,8 +1,12 @@
 <script module lang="ts">
+  import { z } from "zod";
+
+  export const heroSchema = z.object({
+    title: z.string().default("Hello"),
+  });
+
+  export type heroProps = z.infer<typeof heroSchema>;
   export const hero = heroSnippet;
-  export type heroProps = {
-    title?: string;
-  };
 </script>
 
 {#snippet heroSnippet({ title = "Hello" }: heroProps)}
