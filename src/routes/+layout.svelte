@@ -12,10 +12,4 @@
   <link rel="icon" href={favicon} />
 </svelte:head>
 
-<Sidebar.Provider>
-  <AppSidebar />
-  <main class="w-full">
-    <Sidebar.Trigger />
-    {@render children?.()}
-  </main>
-</Sidebar.Provider>
+{@render children?.()}

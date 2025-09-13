@@ -11,8 +11,15 @@
 </script>
 
 {#snippet footerSnippet({ email, name }: footerProps)}
-  <footer class="">
-    {email} |
-    {name}
+  <footer class="border-t border-gray-200 mt-12 pt-8 pb-6">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm text-gray-600">
+        <a href="mailto:{email}" class="hover:text-gray-900 transition-colors font-medium">
+          {email}
+        </a>
+        <span class="hidden sm:inline text-gray-400">•</span>
+        <span class="font-medium">{name}</span>
+      </div>
+    </div>
   </footer>
 {/snippet}

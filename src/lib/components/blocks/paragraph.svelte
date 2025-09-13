@@ -12,5 +12,7 @@
 {#snippet paragraphSnippet({
   text = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.",
 }: paragraphProps)}
-  <p class="">{text}</p>
+  <div class="max-w-3xl mx-auto px-6 my-6">
+    <p class="text-lg leading-relaxed text-gray-700">{text}</p>
+  </div>
 {/snippet}

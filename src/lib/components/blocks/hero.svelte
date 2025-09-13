@@ -10,9 +10,9 @@
 </script>
 
 {#snippet heroSnippet({ title = "Hello" }: heroProps)}
-  <h2
-    class="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
-  >
-    {title}
-  </h2>
+  <div class="text-center py-16 px-6">
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6 max-w-4xl mx-auto">
+      {title}
+    </h1>
+  </div>
 {/snippet}

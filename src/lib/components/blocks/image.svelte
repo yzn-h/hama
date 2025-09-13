@@ -14,5 +14,12 @@
   src = "https://placehold.co/600x400",
   alt = "Image",
 }: imageProps)}
-  <img class="" {src} {alt} />
+  <div class="my-8 mx-auto max-w-4xl px-6">
+    <img 
+      class="w-full h-auto rounded-lg shadow-sm" 
+      {src} 
+      {alt}
+      loading="lazy"
+    />
+  </div>
 {/snippet}

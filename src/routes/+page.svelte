@@ -58,7 +58,7 @@
   }
 </script>
 
-<div class="h-[calc(100svh-2rem)] overflow-hidden flex flex-col w-full">
+<div class="h-[100svh] overflow-hidden flex flex-col w-full">
   {#if currentMode === "edit"}
     <div></div>
     <button onclick={() => addBlock("image")}>add image</button>
@@ -66,6 +66,7 @@
     <button onclick={() => addBlock("footer")}>add footer</button>
     <button onclick={() => addBlock("paragraph")}>add text</button>
     <button onclick={() => addBlock("hero")}>add hero</button>
+    <button onclick={() => addBlock("paragraph")}>add paragraph</button>
 
     <button onclick={() => serializeBlocks()}>test serialize</button>
     <button onclick={() => deserializeBlocks(serializeBlocks())}
