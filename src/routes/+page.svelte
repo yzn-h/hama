@@ -9,8 +9,11 @@
 
   import GripVertical from "@lucide/svelte/icons/grip-vertical";
   import PenIcon from "@lucide/svelte/icons/pen-tool";
+  import Download from "@lucide/svelte/icons/download";
+  import Upload from "@lucide/svelte/icons/upload";
 
   import { buttonVariants } from "@/components/ui/button";
+  import { Button } from "@/components/ui/button";
 
   let currentMode: "edit" | "preview" = $state("edit");
   $inspect(currentMode);
@@ -23,7 +26,7 @@
 
   let blocks: block[] = $state([
     {
-      id: "sfsdfs",
+      id: crypto.randomUUID(),
       type: "hero",
       block: snippets.hero,
       props: { title: "Hello" },
@@ -46,16 +49,62 @@
       type: block.type,
       props: block.props,
     }));
-    console.log("serialized", serialized);
 
-    return JSON.stringify(serialized);
+    return JSON.stringify(serialized, null, 2);
   }
 
   function deserializeBlocks(raw: string) {
-    console.log("raw", raw);
-    console.log("JSON.parse(raw)", JSON.parse(raw));
-    const parsed = JSON.parse(raw) as block[];
-    console.log(parsed.map((b) => ({ ...b, block: snippets[b.type] })));
+    const parsed = JSON.parse(raw) as Array<{
+      id: string;
+      type: keyof typeof snippets;
+      props: any;
+    }>;
+
+    blocks = parsed.map((b) => ({
+      ...b,
+      block: snippets[b.type],
+    }));
+  }
+
+  function exportToFile() {
+    const data = serializeBlocks();
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `hama-blocks-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importFromFile() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          deserializeBlocks(content);
+        } catch (error) {
+          console.error("Error importing file:", error);
+          alert(
+            "Error importing file. Please check that it's a valid JSON file."
+          );
+        }
+      };
+      reader.readAsText(file);
+    };
+
+    input.click();
   }
 </script>
 
@@ -82,18 +131,49 @@
     {/each}
   </RadioGroup.Root>
   {#if currentMode === "edit"}
-    <div>
-      <button onclick={() => addBlock("image")}>add image</button>
-      <button onclick={() => addBlock("contactForm")}>add form</button>
-      <button onclick={() => addBlock("footer")}>add footer</button>
-      <button onclick={() => addBlock("paragraph")}>add text</button>
-      <button onclick={() => addBlock("hero")}>add hero</button>
-      <button onclick={() => addBlock("paragraph")}>add paragraph</button>
+    <div class="flex flex-col gap-4 p-4">
+      <div class="flex flex-wrap gap-2">
+        <Button onclick={() => addBlock("image")} variant="outline" size="sm"
+          >add image</Button
+        >
+        <Button
+          onclick={() => addBlock("contactForm")}
+          variant="outline"
+          size="sm">add form</Button
+        >
+        <Button onclick={() => addBlock("footer")} variant="outline" size="sm"
+          >add footer</Button
+        >
+        <Button
+          onclick={() => addBlock("paragraph")}
+          variant="outline"
+          size="sm">add text</Button
+        >
+        <Button onclick={() => addBlock("hero")} variant="outline" size="sm"
+          >add hero</Button
+        >
+      </div>
 
-      <button onclick={() => serializeBlocks()}>test serialize</button>
-      <button onclick={() => deserializeBlocks(serializeBlocks())}
-        >test deserialize</button
-      >
+      <div class="flex gap-2 justify-center">
+        <Button
+          onclick={exportToFile}
+          variant="default"
+          size="sm"
+          class="flex items-center gap-2"
+        >
+          <Download class="h-4 w-4" />
+          Export
+        </Button>
+        <Button
+          onclick={importFromFile}
+          variant="default"
+          size="sm"
+          class="flex items-center gap-2"
+        >
+          <Upload class="h-4 w-4" />
+          Import
+        </Button>
+      </div>
     </div>
 
     <div
