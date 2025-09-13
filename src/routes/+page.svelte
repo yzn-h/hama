@@ -11,6 +11,7 @@
   import PenIcon from "@lucide/svelte/icons/pen-tool";
   import Download from "@lucide/svelte/icons/download";
   import Upload from "@lucide/svelte/icons/upload";
+  import X from "@lucide/svelte/icons/x";
   import {
     dndzone,
     dragHandle,
@@ -122,6 +123,10 @@
   function handleSort(e: CustomEvent) {
     blocks = e.detail.items;
   }
+
+  function deleteBlock(id: string) {
+    blocks = blocks.filter(block => block.id !== id);
+  }
 </script>
 
 <div
@@ -204,9 +209,16 @@
       {#each blocks as block (block.id)}
         <div
           animate:flip={{ duration: flipDurationMs }}
-          class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200"
+          class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200 relative"
           data-drag-disabled="true"
         >
+          <button
+            onclick={() => deleteBlock(block.id)}
+            class="absolute -top-1 -right-1 w-4 h-4 bg-gray-200 hover:bg-gray-300 text-gray-600 hover:text-gray-800 rounded-full flex items-center justify-center shadow-sm transition-colors z-10"
+            title="Delete block"
+          >
+            <X class="h-2 w-2" />
+          </button>
           <Collapsible.Root class=" flex w-full flex-col h-full items-center">
             <div class="flex w-full h-full items-center">
               <div
