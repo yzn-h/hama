@@ -302,7 +302,10 @@
       </div>
     </Tabs.Content>
 
-    <Tabs.Content value="preview" class="grow overflow-y-auto">
+    <Tabs.Content
+      value="preview"
+      class="w-full flex flex-col items-start grow overflow-y-auto"
+    >
       <Card.Root
         class="overflow-y-auto flex flex-col grow my-5 p-2 place-self-center w-full max-w-2xl"
       >
