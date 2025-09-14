@@ -26,6 +26,22 @@
 
   let flipDurationMs = 100;
 
+  const blockTypeMap = {
+    hero: { icon: StarIcon, label: "Hero", description: "Main banner section" },
+    image: { icon: ImageIcon, label: "Image", description: "Visual content" },
+    paragraph: {
+      icon: FileTextIcon,
+      label: "Text",
+      description: "Rich text content",
+    },
+    contactForm: { icon: MailIcon, label: "Form", description: "Contact form" },
+    footer: {
+      icon: PannelBottomIcon,
+      label: "Footer",
+      description: "Page footer",
+    },
+  };
+
   let currentMode: "edit" | "preview" = $state("edit");
   $inspect(currentMode);
   type block = {
@@ -149,9 +165,9 @@
         <div
           class="flex gap-3 overflow-x-scroll w-full lg:w-full lg:grid lg:grid-cols-5 lg:overflow-x-visible max-w-4xl mx-auto p-2"
         >
-          {#each [{ type: "hero", icon: StarIcon, label: "Hero", description: "Main banner section" }, { type: "image", icon: ImageIcon, label: "Image", description: "Visual content" }, { type: "paragraph", icon: FileTextIcon, label: "Text", description: "Rich text content" }, { type: "contactForm", icon: MailIcon, label: "Form", description: "Contact form" }, { type: "footer", icon: PannelBottomIcon, label: "Footer", description: "Page footer" }] as blockType}
+          {#each Object.entries(blockTypeMap) as [type, blockType]}
             <button
-              onclick={() => addBlock(blockType.type as keyof typeof snippets)}
+              onclick={() => addBlock(type as keyof typeof snippets)}
               class="group relative flex min-w-auto md:min-w-[170px] flex-col items-center justify-center p-4 rounded-lg border-2 border-gray-200 bg-white hover:border-gray-300 hover:shadow-md transition-all duration-200 hover:bg-gray-50 active:bg-gray-100 flex-shrink-0"
             >
               <div
@@ -234,8 +250,14 @@
                 >
                   <GripVertical class="h-5 w-5" />
                 </div>
-                <div class="grow mx-3">
-                  {block.type}
+                <div class="flex items-center gap-2 grow mx-3">
+                  {#if blockTypeMap[block.type]}
+                    {@const BlockIcon = blockTypeMap[block.type].icon}
+                    <BlockIcon class="h-4 w-4 text-gray-600"></BlockIcon>
+                    <span>{blockTypeMap[block.type].label}</span>
+                  {:else}
+                    <span>{block.type}</span>
+                  {/if}
                 </div>
                 <Collapsible.Trigger
                   class={buttonVariants({
@@ -253,6 +275,7 @@
                 class="space-y-2 w-full mt-4 overflow-visible"
               >
                 <SchemaForm
+                  id={block.id}
                   schema={schemas[block.type]}
                   bind:values={block.props}
                 />
