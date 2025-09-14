@@ -275,10 +275,10 @@
                     class={buttonVariants({
                       variant: "ghost",
                       size: "sm",
-                      class: "w-9 p-0",
+                      class: "w-9 p-0 hover:scale-105 active:scale-95 transition-transform duration-150 hover:bg-gray-100 active:bg-gray-200",
                     })}
                   >
-                    <PenIcon />
+                    <PenIcon class="transition-colors duration-150" />
                     <span class="sr-only">Toggle</span>
                   </Collapsible.Trigger>
                 {/if}
