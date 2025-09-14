@@ -10,6 +10,10 @@ import {
   paragraph,
   paragraphSchema,
 } from "./components/blocks/paragraph.svelte";
+import {
+  separator,
+  separatorSchema,
+} from "./components/blocks/separator.svelte";
 
 export const snippets = {
   hero,
@@ -17,6 +21,7 @@ export const snippets = {
   contactForm,
   footer,
   paragraph,
+  separator,
 };
 
 export const schemas = {
@@ -25,4 +30,5 @@ export const schemas = {
   contactForm: contactFormSchema,
   footer: footerSchema,
   paragraph: paragraphSchema,
+  separator: separatorSchema,
 };

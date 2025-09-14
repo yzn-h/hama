@@ -18,6 +18,7 @@
   import PannelBottomIcon from "@lucide/svelte/icons/panel-bottom";
   import StarIcon from "@lucide/svelte/icons/star";
   import Plus from "@lucide/svelte/icons/plus";
+  import MinusIcon from "@lucide/svelte/icons/minus";
   import { dragHandle, dragHandleZone } from "svelte-dnd-action";
 
   import { buttonVariants } from "@/components/ui/button";
@@ -39,6 +40,11 @@
       icon: PannelBottomIcon,
       label: "Footer",
       description: "Page footer",
+    },
+    separator: {
+      icon: MinusIcon,
+      label: "Separator",
+      description: "Divider line",
     },
   };
 
@@ -144,6 +150,11 @@
   function deleteBlock(id: string) {
     blocks = blocks.filter((block) => block.id !== id);
   }
+
+  function hasProps(blockType: keyof typeof snippets): boolean {
+    const schema = schemas[blockType];
+    return Object.keys(schema.entries).length > 0;
+  }
 </script>
 
 <div
@@ -163,7 +174,7 @@
           Add Content Blocks
         </h3>
         <div
-          class="flex gap-3 overflow-x-scroll w-full lg:w-full lg:grid lg:grid-cols-5 lg:overflow-x-visible max-w-4xl mx-auto p-2"
+          class="flex gap-3 overflow-x-scroll w-full lg:w-full lg:grid lg:grid-cols-6 lg:overflow-x-visible max-w-6xl mx-auto p-2"
         >
           {#each Object.entries(blockTypeMap) as [type, blockType]}
             <button
@@ -231,7 +242,7 @@
           <div
             animate:flip={{ duration: flipDurationMs }}
             in:scale={{ duration: 150 }}
-            class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200 relative"
+            class="flex items-center gap-3 min-h-14 p-3 rounded-lg border border-gray-200 bg-gray-50 transition-colors duration-200 relative"
             data-drag-disabled="true"
           >
             <button
@@ -259,27 +270,31 @@
                     <span>{block.type}</span>
                   {/if}
                 </div>
-                <Collapsible.Trigger
-                  class={buttonVariants({
-                    variant: "ghost",
-                    size: "sm",
-                    class: "w-9 p-0",
-                  })}
-                >
-                  <PenIcon />
-                  <span class="sr-only">Toggle</span>
-                </Collapsible.Trigger>
+                {#if hasProps(block.type)}
+                  <Collapsible.Trigger
+                    class={buttonVariants({
+                      variant: "ghost",
+                      size: "sm",
+                      class: "w-9 p-0",
+                    })}
+                  >
+                    <PenIcon />
+                    <span class="sr-only">Toggle</span>
+                  </Collapsible.Trigger>
+                {/if}
               </div>
 
-              <Collapsible.Content
-                class="space-y-2 w-full mt-4 overflow-visible"
-              >
-                <SchemaForm
-                  id={block.id}
-                  schema={schemas[block.type]}
-                  bind:values={block.props}
-                />
-              </Collapsible.Content>
+              {#if hasProps(block.type)}
+                <Collapsible.Content
+                  class="space-y-2 w-full mt-4 overflow-visible"
+                >
+                  <SchemaForm
+                    id={block.id}
+                    schema={schemas[block.type]}
+                    bind:values={block.props}
+                  />
+                </Collapsible.Content>
+              {/if}
             </Collapsible.Root>
           </div>
         {/each}
