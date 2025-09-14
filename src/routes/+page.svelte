@@ -149,7 +149,9 @@
     contentBlocks = contentBlocks.filter((block) => block.id !== blockId);
   }
 
-  function blockHasConfigurableProps(blockType: keyof typeof snippets): boolean {
+  function blockHasConfigurableProps(
+    blockType: keyof typeof snippets
+  ): boolean {
     const blockSchema = schemas[blockType];
     return Object.keys(blockSchema.entries).length > 0;
   }
@@ -273,7 +275,8 @@
                     class={buttonVariants({
                       variant: "ghost",
                       size: "sm",
-                      class: "w-9 p-0 hover:scale-105 active:scale-95 transition-transform duration-150 hover:bg-gray-100 active:bg-gray-200",
+                      class:
+                        "w-9 p-0 hover:scale-105 active:scale-95 transition-transform duration-150 hover:bg-gray-100 active:bg-gray-200",
                     })}
                   >
                     <PenIcon class="transition-colors duration-150" />
